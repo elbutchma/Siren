@@ -278,7 +278,7 @@ private extension Siren {
         guard didCheckForVersionUpdateObserver == nil else { return }
         didCheckForVersionUpdateObserver = NotificationCenter
             .default
-            .addObserver(forName: NSNotification.Name(rawValue: Siren.didCheckForVersionUpdateObserver),
+            .addObserver(forName: NSNotification.Name(rawValue: Siren.checkForVersionUpdateNotification),
                          object: nil,
                          queue: nil) { [weak self] _ in
                             guard let self = self else { return }
