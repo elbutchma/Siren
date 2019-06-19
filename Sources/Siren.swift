@@ -61,6 +61,8 @@ public final class Siren: NSObject {
 
     /// The completion handler used to return the results or errors returned by Siren.
     private var resultsHandler: ResultsHandler?
+    
+    static let didHideSplashScreenNotification = "didHideSplashScreenNotification"
 
     /// The deinitialization method that clears out all observers,
     deinit {
@@ -276,7 +278,7 @@ private extension Siren {
         guard didHideSplashScreenObserver == nil else { return }
         didHideSplashScreenObserver = NotificationCenter
             .default
-            .addObserver(forName: SirenConstants.didHideSplashScreenNotification,
+            .addObserver(forName: Siren.didHideSplashScreenNotification,
                          object: nil,
                          queue: nil) { [weak self] _ in
                             guard let self = self else { return }
