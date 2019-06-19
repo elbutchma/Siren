@@ -51,7 +51,7 @@ public final class Siren: NSObject {
     var didEnterBackgroundObserver: NSObjectProtocol?
     
     /// The retained `NotificationCenter` observer that listens for `didHideSplashScreenNotification` notifications.
-    var didHideSplashScreenObserver: NSObjectProtocol?
+    var didCheckForVersionUpdateObserver: NSObjectProtocol?
 
     /// The last date that an alert was presented to the user.
     private var alertPresentationDate: Date? = UserDefaults.alertPresentationDate
@@ -62,14 +62,14 @@ public final class Siren: NSObject {
     /// The completion handler used to return the results or errors returned by Siren.
     private var resultsHandler: ResultsHandler?
     
-    static let didHideSplashScreenNotification = "didHideSplashScreenNotification"
+    static let checkForVersionUpdateNotification = "checkForVersionUpdateNotification"
 
     /// The deinitialization method that clears out all observers,
     deinit {
         presentationManager.alertController?.dismiss(animated: true, completion: nil)
         removeForegroundObservers()
         removeBackgroundObservers()
-        removeDidHideSplashScreenObserver()
+        removeCheckForVersionUpdateObserver()
     }
 }
 
@@ -91,7 +91,7 @@ public extension Siren {
             performVersionCheck()
         case .onForeground:
             addForegroundObservers()
-            addDidHideSplashScreenObserver()
+            addDidCheckForVersionUpdateObserver()
         }
 
         // Add background app state change observers.
@@ -274,11 +274,11 @@ private extension Siren {
         }
     }
     
-    func addDidHideSplashScreenObserver() {
-        guard didHideSplashScreenObserver == nil else { return }
-        didHideSplashScreenObserver = NotificationCenter
+    func addDidCheckForVersionUpdateObserver() {
+        guard didCheckForVersionUpdateObserver == nil else { return }
+        didCheckForVersionUpdateObserver = NotificationCenter
             .default
-            .addObserver(forName: Siren.didHideSplashScreenNotification,
+            .addObserver(forName: NSNotification.Name(rawValue: Siren.didCheckForVersionUpdateObserver),
                          object: nil,
                          queue: nil) { [weak self] _ in
                             guard let self = self else { return }
@@ -331,8 +331,8 @@ private extension Siren {
         didEnterBackgroundObserver = nil
     }
     
-    func removeDidHideSplashScreenObserver() {
-        NotificationCenter.default.removeObserver(didHideSplashScreenObserver as Any)
-        didHideSplashScreenObserver = nil
+    func removeCheckForVersionUpdateObserver() {
+        NotificationCenter.default.removeObserver(didCheckForVersionUpdateObserver as Any)
+        didCheckForVersionUpdateObserver = nil
     }
 }
