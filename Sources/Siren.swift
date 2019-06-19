@@ -49,6 +49,9 @@ public final class Siren: NSObject {
 
     /// The retained `NotificationCenter` observer that listens for `UIApplication.didEnterBackgroundNotification` notifications.
     var didEnterBackgroundObserver: NSObjectProtocol?
+    
+    /// The retained `NotificationCenter` observer that listens for `didHideSplashScreenNotification` notifications.
+    var didHideSplashScreenObserver: NSObjectProtocol?
 
     /// The last date that an alert was presented to the user.
     private var alertPresentationDate: Date? = UserDefaults.alertPresentationDate
@@ -64,6 +67,7 @@ public final class Siren: NSObject {
         presentationManager.alertController?.dismiss(animated: true, completion: nil)
         removeForegroundObservers()
         removeBackgroundObservers()
+        removeDidHideSplashScreenObserver()
     }
 }
 
@@ -85,6 +89,7 @@ public extension Siren {
             performVersionCheck()
         case .onForeground:
             addForegroundObservers()
+            addDidHideSplashScreenObserver()
         }
 
         // Add background app state change observers.
@@ -266,6 +271,18 @@ private extension Siren {
                             self.performVersionCheck()
         }
     }
+    
+    func addDidHideSplashScreenObserver() {
+        guard didHideSplashScreenObserver == nil else { return }
+        didHideSplashScreenObserver = NotificationCenter
+            .default
+            .addObserver(forName: SirenConstants.didHideSplashScreenNotification,
+                         object: nil,
+                         queue: nil) { [weak self] _ in
+                            guard let self = self else { return }
+                            self.performVersionCheck()
+        }
+    }
 
     /// Adds an observer that listens for when the user enters the app switcher
     /// and when the app is sent to the background.
@@ -310,5 +327,10 @@ private extension Siren {
 
         NotificationCenter.default.removeObserver(didEnterBackgroundObserver as Any)
         didEnterBackgroundObserver = nil
+    }
+    
+    func removeDidHideSplashScreenObserver() {
+        NotificationCenter.default.removeObserver(didHideSplashScreenObserver as Any)
+        didHideSplashScreenObserver = nil
     }
 }
